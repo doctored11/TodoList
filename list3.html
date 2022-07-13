@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="css/normalize.css" />
+    <link rel="stylesheet" href="css/bootstrap-grid.min.css" />
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <script defer src="js/todo-app.js"></script>
+    <script defer>
+      document.addEventListener('DOMContentLoaded', function () {
+        createTodoApp(document.getElementById('todo-app'), 'Список3-');
+      });
+    </script>
+  </head>
+
+  <body>
+    <div class="container mb-5">
+      <nav class="nav">
+        <a href="index.html" class="nav-link">Список дел №1</a>
+        <a href="list2.html" class="nav-link">Список дел №2</a>
+        <a href="list3.html" class="nav-link">Список дел №3</a>
+      </nav>
+    </div>
+    <div class="container" id="todo-app"></div>
+  </body>
+</html>
