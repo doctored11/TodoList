@@ -1,14 +1,5 @@
 {
-  // document.addEventListener('DOMContentLoaded', function () {
-  //   createTodoApp(document.getElementById('todo-app1'), 'мои дела');
-  //   createTodoApp(document.getElementById('todo-app2'), 'мои дела2');
-  //   createTodoApp(document.getElementById('todo-app3'), 'мои дела3');
-  // });
-
-  //
-
-  //
-
+  // начальная сцена
   function createAppTitle(title) {
     let appTitle = document.createElement('h2');
     appTitle.textContent = title;
@@ -25,21 +16,18 @@
     button.setAttribute('disabled', 'true');
 
     form.addEventListener('input', function () {
-      console.log('1');
       if (!input.value) {
-        console.log('2');
         button.setAttribute('disabled', 'true');
       } else {
-        console.log('3');
         button.removeAttribute('disabled');
       }
     });
 
-    form.classList.add('input-group', 'mb-3', 'container__form');
-    input.classList.add('form-control', 'container__input');
+    form.classList.add('input-group', 'container__form');
+    input.classList.add('form-control');
     input.placeholder = 'Запланированное Дело*';
-    buttonContainer.classList.add('input-group-append');
-    button.classList.add('btn', 'btn-primary');
+    buttonContainer.classList.add('input-group-btn');
+    button.classList.add('btn', 'btn-main');
     button.setAttribute('disabled', 'true');
     button.textContent = 'Добавить';
 
@@ -52,28 +40,32 @@
       button,
     };
   }
+
   function createTodoList() {
     let list = document.createElement('ul');
     list.classList.add('list-group');
     return list;
   }
+  // end
 
-  function createTodoItem(name) {
+  function createTodoItem(arrayOfTasks, state) {
+    console.log('😡');
+    console.log(arrayOfTasks);
+
     let item = document.createElement('li');
 
     let buttonGroup = document.createElement('div');
     let doneBtn = document.createElement('button');
     let deleteBtn = document.createElement('button');
 
-    item.classList.add(
-      'list-group-item',
-      'd-flex',
-      'justify-content-between',
-      'align-item-center'
-    );
+    item.classList.add('list-group-item');
+
+    let name = arrayOfTasks[0];
+    console.log(name);
+
     item.textContent = name;
 
-    buttonGroup.classList.add('btn-group', 'btn-group-sm');
+    buttonGroup.classList.add('btn-group');
     doneBtn.classList.add('btn', 'btn-success');
     doneBtn.textContent = 'готово!';
     deleteBtn.classList.add('btn', 'btn-danger');
@@ -82,6 +74,7 @@
     buttonGroup.append(doneBtn);
     buttonGroup.append(deleteBtn);
     item.append(buttonGroup);
+    console.log('⭐️');
 
     return {
       item,
@@ -89,6 +82,7 @@
       deleteBtn,
     };
   }
+
   function createTodoApp(container, title) {
     let appTitle = createAppTitle(title);
     let itemForm = createTodoItemForm();
@@ -97,6 +91,19 @@
     container.append(appTitle);
     container.append(itemForm.form);
     container.append(todoList);
+    if (UsualTasks.length > 0) {
+      console.log('отрисовка списка');
+      let state = 'first';
+      for (let i = 0; i <= UsualTasks.length - 1; ++i) {
+        console.log(Object.values(UsualTasks[i]));
+        let todoItem = createTodoItem(Object.values(UsualTasks[i]));
+        console.log('🤡');
+        console.log(todoItem);
+
+        paintList(todoItem);
+      }
+      console.log('/////');
+    }
 
     itemForm.form.addEventListener('submit', function (el) {
       el.preventDefault();
@@ -104,22 +111,57 @@
       if (!itemForm.input.value) {
         return;
       }
+      UsualTasks.push({ name: itemForm.input.value, done: false });
+      console.log(UsualTasks);
+
       document.querySelector('.btn').setAttribute('disabled', 'true');
 
-      let todoItem = createTodoItem(itemForm.input.value);
+      let todoItem = createTodoItem(Object.values(UsualTasks[UsualTasks.length - 1]));
+      addBtns(todoItem);
+
+      todoList.append(todoItem.item);
+
+      itemForm.input.value = '';
+    });
+
+    function paintList(todoItem) {
+      addBtns(todoItem);
+      todoList.append(todoItem.item);
+    }
+    function addBtns(todoItem) {
       todoItem.deleteBtn.addEventListener('click', function () {
+        let taskContent = [];
+        for (let i = 0; i <= todoItem.item.textContent.length - 15; i++) {
+          taskContent.push(Object.values(todoItem.item.textContent[i]).join(''));
+        }
+        taskContent = Object.values(taskContent);
+
+        let searchContent = taskContent.join('');
+
         if (confirm('уверены?')) {
+          for (let i = 0; i <= UsualTasks.length - 1; ++i) {
+            if (Object.values(UsualTasks[i])[0].includes(searchContent)) {
+              UsualTasks.splice(i, 1);
+            }
+          }
+          console.log(UsualTasks);
           todoItem.item.remove();
         }
       });
       todoItem.doneBtn.addEventListener('click', function () {
         todoItem.item.classList.toggle('list-group-item-success');
       });
-
-      todoList.append(todoItem.item);
-
-      itemForm.input.value = '';
-    });
+    }
   }
+
   window.createTodoApp = createTodoApp;
+  // cписок дел
+  let UsualTasks = [
+    { name: 'Проснуться', done: false },
+    { name: 'Помыть попу', done: false },
+    { name: 'Почистить зубы', done: false },
+    { name: 'Поесть', done: false },
+    { name: 'Поучиться 🤡', done: false },
+    { name: 'и спать....', done: false },
+  ];
 }
