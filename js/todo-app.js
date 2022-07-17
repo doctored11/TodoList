@@ -18,14 +18,13 @@
     UsualTasks = getUsualTasks();
     console.log(UsualTasks);
     if (UsualTasks == null || UsualTasks == undefined) {
-      console.log('защита');
+      console.log('null defend');
       defendLocal(localId);
     }
     UsualTasks = getUsualTasks();
     let appTitle = createAppTitle(title);
     let itemForm = createTodoItemForm();
     let todoList = createTodoList();
-    console.log(UsualTasks);
 
     appendToWhats(container, appTitle, itemForm.form, todoList);
     checkStarterArray(UsualTasks, todoList);
@@ -121,12 +120,9 @@
     return appTitle;
   }
   function pushLocalStorage(UsualTasks) {
-    // UsualTasks = getUsualTasks();
     console.log('Local');
-    // console.log(UsualTasks);
-    localStorage.setItem(localId, JSON.stringify(UsualTasks));
 
-    // statusCheck(0, UsualTasks);
+    localStorage.setItem(localId, JSON.stringify(UsualTasks));
   }
 
   function createTodoList() {
@@ -268,12 +264,11 @@
     });
     todoItem.doneBtn.addEventListener('click', function () {
       console.log('Подтвердил!✅');
-      console.log(UsualTasks[searchElementTarget(searchContent)]);
-      UsualTasks = JSON.parse(localStorage.getItem(localId));
+      UsualTasks = getUsualTasks();
 
       UsualTasks[searchElementTarget(searchContent)].done =
         !UsualTasks[searchElementTarget(searchContent)].done;
-      console.log(UsualTasks[searchElementTarget(searchContent)]);
+
       pushLocalStorage(UsualTasks);
       statusCheck(todoItem, UsualTasks);
       // statusCheck(todoItem, UsualTasks);
@@ -285,7 +280,7 @@
     // UsualTasks = JSON.parse(localStorage.getItem('id1'));
 
     UsualTasks = JSON.parse(localStorage.getItem(localId));
-    console.log(UsualTasks.length);
+
     for (let i = 0; i < UsualTasks.length; ++i) {
       // console.log(UsualTasks[i], UsualTasks[i].done);
 
@@ -294,12 +289,10 @@
 
       console.log(numcl);
 
-      console.log('💎');
-      console.log(UsualTasks.length);
       let targetSelect = document.querySelector(numcl);
 
       if (UsualTasks[i].done === true) {
-        console.log('💎🤘');
+        console.log('🎯');
         console.log(targetSelect);
         targetSelect.classList.add('list-group-item-success');
       } else {
