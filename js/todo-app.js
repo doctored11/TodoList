@@ -2,22 +2,26 @@
   // глобальная видимость
 
   window.createTodoApp = createTodoApp;
-  window.UsualTasks = JSON.parse(localStorage.getItem('UsualyTasks')) || [
-    { name: 'дело раз', done: false },
-    { name: 'дикобраз', done: false },
-    { name: '😳🦖', done: false },
-    { name: 'rrr1', done: false },
-    { name: 'rrr2', done: false },
-    { name: 'rrr3', done: false },
-  ];
-  // localStorage.setItem('UsualyTasks', JSON.stringify(UsualTasks));
+  window.UsualTasks = JSON.parse(localStorage.getItem('id1')) || [];
+  // localStorage.setItem('id1', JSON.stringify(UsualTasks));
 
   // cписок дел
 
   //-
 
   // основная вызываемая функция
-  function createTodoApp(container, title, UsualTasks) {
+  function createTodoApp(container, title, UsualTasks, localId) {
+    console.log('start');
+    window.localId = localId;
+    UsualTasks = getUsualTasks();
+    pushLocalStorage(UsualTasks);
+    UsualTasks = getUsualTasks();
+    console.log(UsualTasks);
+    if (UsualTasks == null || UsualTasks == undefined) {
+      console.log('защита');
+      defendLocal(localId);
+    }
+    UsualTasks = getUsualTasks();
     let appTitle = createAppTitle(title);
     let itemForm = createTodoItemForm();
     let todoList = createTodoList();
@@ -25,6 +29,7 @@
 
     appendToWhats(container, appTitle, itemForm.form, todoList);
     checkStarterArray(UsualTasks, todoList);
+    UsualTasks = getUsualTasks();
     pushNew(itemForm, todoList, UsualTasks);
     statusCheck(0, UsualTasks);
   }
@@ -38,6 +43,22 @@
   //
   //
   //
+  function defendLocal(UsualTasks) {
+    UsualTasks = [];
+    if (localId == 'id1') {
+      UsualTasks = [
+        { name: 'дело раз', done: false },
+        { name: 'дикобраз', done: false },
+        { name: '😳🦖', done: false },
+        { name: 'rrr1', done: false },
+        { name: 'rrr2', done: false },
+        { name: 'rrr3', done: false },
+      ];
+    }
+    pushLocalStorage(UsualTasks);
+    console.log(UsualTasks);
+  }
+
   function appendToWhats(To, what1, what2, what3) {
     To.append(what1);
     To.append(what2);
@@ -59,6 +80,7 @@
 
   function pushNew(itemForm, todoList, UsualTasks) {
     itemForm.form.addEventListener('submit', function (el) {
+      UsualTasks = getUsualTasks();
       el.preventDefault();
 
       if (!itemForm.input.value) {
@@ -66,6 +88,7 @@
       }
       console.log('push');
       UsualTasks.push({ name: itemForm.input.value, done: false });
+
       pushLocalStorage(UsualTasks);
 
       console.log(UsualTasks);
@@ -98,8 +121,10 @@
     return appTitle;
   }
   function pushLocalStorage(UsualTasks) {
+    // UsualTasks = getUsualTasks();
     console.log('Local');
-    localStorage.setItem('UsualyTasks', JSON.stringify(UsualTasks));
+    // console.log(UsualTasks);
+    localStorage.setItem(localId, JSON.stringify(UsualTasks));
 
     // statusCheck(0, UsualTasks);
   }
@@ -230,6 +255,7 @@
   function addBtns(todoItem, UsualTasks) {
     let searchContent = searchTargetList(todoItem);
     todoItem.deleteBtn.addEventListener('click', function () {
+      UsualTasks = getUsualTasks();
       if (confirm('уверены?')) {
         console.log(UsualTasks);
         let n = searchElementTarget(searchContent);
@@ -243,6 +269,7 @@
     todoItem.doneBtn.addEventListener('click', function () {
       console.log('Подтвердил!✅');
       console.log(UsualTasks[searchElementTarget(searchContent)]);
+      UsualTasks = JSON.parse(localStorage.getItem(localId));
 
       UsualTasks[searchElementTarget(searchContent)].done =
         !UsualTasks[searchElementTarget(searchContent)].done;
@@ -255,9 +282,9 @@
 
   function statusCheck(todoItem, UsualTasks) {
     console.log(' 👁 Проверка статусов ');
-    // UsualTasks = JSON.parse(localStorage.getItem('UsualyTasks'));
+    // UsualTasks = JSON.parse(localStorage.getItem('id1'));
 
-    UsualTasks = JSON.parse(localStorage.getItem('UsualyTasks'));
+    UsualTasks = JSON.parse(localStorage.getItem(localId));
     console.log(UsualTasks.length);
     for (let i = 0; i < UsualTasks.length; ++i) {
       // console.log(UsualTasks[i], UsualTasks[i].done);
@@ -280,11 +307,19 @@
       }
     }
   }
+  function getUsualTasks() {
+    console.log('get!!!!');
+    UsualTasks = JSON.parse(localStorage.getItem(localId));
+    console.log(UsualTasks);
+    return UsualTasks;
+  }
 
   function updateClassNumber(n) {
-    for (let i = n; i <= UsualTasks.length; ++i) {
+    UsualTasks = getUsualTasks();
+    for (let i = n; i < UsualTasks.length; ++i) {
       console.log(n + 'минус 1');
       let item = document.querySelector(`.class${i}`);
+      console.log(item);
 
       item.classList.remove(`class${i}`);
       item.classList.add(`class${i - 1}`);
