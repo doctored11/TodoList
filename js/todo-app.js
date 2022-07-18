@@ -3,14 +3,20 @@
 
   window.createTodoApp = createTodoApp;
   window.UsualTasks = JSON.parse(localStorage.getItem('id1')) || [];
-  // localStorage.setItem('id1', JSON.stringify(UsualTasks));
-
-  // cписок дел
+  window.NumberLists = JSON.parse(localStorage.getItem('lists')) || [0, 1, 2];
+  //  let  numLists = [0, 1, 2];
+  //   localStorage.setItem('lists', JSON.stringify(numLists));
 
   //-
 
   // основная вызываемая функция
   function createTodoApp(container, title, UsualTasks, localId) {
+    numLists = JSON.parse(localStorage.getItem('lists')) || [0, 1, 2];
+    listRename();
+    listStatusCheck(numLists);
+    localStorage.setItem('lists', JSON.stringify(numLists));
+    //
+    title = JSON.parse(localStorage.getItem(`title-${localId}`)) || 'Список делишек';
     console.log('start');
     window.localId = localId;
     UsualTasks = getUsualTasks();
@@ -22,15 +28,22 @@
       defendLocal(localId);
     }
     UsualTasks = getUsualTasks();
+    let containerTitle = createNewContainer();
     let appTitle = createAppTitle(title);
+    let renameBtn = createRenameBtn();
     let itemForm = createTodoItemForm();
     let todoList = createTodoList();
+    deleteList();
 
-    appendToWhats(container, appTitle, itemForm.form, todoList);
+    appendToWhats(containerTitle, appTitle, renameBtn);
+
+    appendToWhats(container, containerTitle, itemForm.form, todoList);
+
     checkStarterArray(UsualTasks, todoList);
     UsualTasks = getUsualTasks();
     pushNew(itemForm, todoList, UsualTasks);
     statusCheck(0, UsualTasks);
+    renameTitle();
   }
 
   // -
@@ -58,10 +71,17 @@
     console.log(UsualTasks);
   }
 
-  function appendToWhats(To, what1, what2, what3) {
+  function appendToWhats(To, what1, what2, what3, what4) {
     To.append(what1);
-    To.append(what2);
-    To.append(what3);
+    if (what2 != undefined) {
+      To.append(what2);
+    }
+    if (what3 != undefined) {
+      To.append(what3);
+    }
+    if (what4 != undefined) {
+      To.append(what4);
+    }
   }
   function checkStarterArray(UsualTasks, todoList) {
     if (UsualTasks.length > 0) {
@@ -81,6 +101,15 @@
     itemForm.form.addEventListener('submit', function (el) {
       UsualTasks = getUsualTasks();
       el.preventDefault();
+
+      for (let i = 0; i <= UsualTasks.length - 1; ++i) {
+        if (Object.values(UsualTasks[i])[0] == itemForm.input.value) {
+          console.log('🛑 Такой таск уже есть!');
+          itemForm.input.value = '';
+          alert('Вы уже заплонировали такое занятие 😅');
+          return;
+        }
+      }
 
       if (!itemForm.input.value) {
         return;
@@ -108,17 +137,12 @@
   function paintList(todoItem, todoList, UsualTasks) {
     console.log('paint');
 
-    addBtns(todoItem, UsualTasks);
+    addBtns(todoItem, UsualTasks, todoList);
     todoList.append(todoItem.item);
 
     return todoItem;
   }
 
-  function createAppTitle(title) {
-    let appTitle = document.createElement('h2');
-    appTitle.textContent = title;
-    return appTitle;
-  }
   function pushLocalStorage(UsualTasks) {
     console.log('Local');
 
@@ -130,17 +154,32 @@
     list.classList.add('list-group');
     return list;
   }
+  function createNewContainer() {
+    let titleContainer = document.createElement('div');
+    titleContainer.classList.add('title-container');
+
+    return titleContainer;
+  }
 
   function createAppTitle(title) {
     let appTitle = document.createElement('h2');
+    appTitle.classList.add('title-h2');
     appTitle.textContent = title;
     return appTitle;
+  }
+  function createRenameBtn() {
+    title = '✏️';
+    let appBtn = document.createElement('button');
+    appBtn.classList.add('ico-btn', 'rename-btn');
+    appBtn.textContent = title;
+    return appBtn;
   }
 
   //
 
   function createTodoItemForm() {
     let form = document.createElement('form');
+
     let input = document.createElement('input');
 
     let buttonContainer = document.createElement('div');
@@ -199,9 +238,10 @@
 
     for (let i = 0; i <= UsualTasks.length - 1; ++i) {
       if (Object.values(UsualTasks[i])[0] == searchContent) {
-        console.log('🔎 поиск:' + searchContent);
+        console.log('🔎 поиск:' + i);
 
         searchResult = i;
+        return searchResult;
       }
     }
 
@@ -248,7 +288,7 @@
     };
   }
 
-  function addBtns(todoItem, UsualTasks) {
+  function addBtns(todoItem, UsualTasks, todoList) {
     let searchContent = searchTargetList(todoItem);
     todoItem.deleteBtn.addEventListener('click', function () {
       UsualTasks = getUsualTasks();
@@ -271,19 +311,15 @@
 
       pushLocalStorage(UsualTasks);
       statusCheck(todoItem, UsualTasks);
-      // statusCheck(todoItem, UsualTasks);
     });
   }
 
   function statusCheck(todoItem, UsualTasks) {
     console.log(' 👁 Проверка статусов ');
-    // UsualTasks = JSON.parse(localStorage.getItem('id1'));
 
     UsualTasks = JSON.parse(localStorage.getItem(localId));
 
     for (let i = 0; i < UsualTasks.length; ++i) {
-      // console.log(UsualTasks[i], UsualTasks[i].done);
-
       console.log(i);
       let numcl = '.class' + i;
 
@@ -316,6 +352,71 @@
 
       item.classList.remove(`class${i}`);
       item.classList.add(`class${i - 1}`);
+    }
+  }
+  function renameTitle() {
+    renameBtn = document.querySelector('.rename-btn');
+    appTitle = document.querySelector('.title-h2');
+    containerTitle = document.querySelector('.title-container');
+    console.log(renameBtn);
+    renameBtn.addEventListener('click', function () {
+      console.log('Клик RENAME');
+
+      let newForm = document.createElement('form');
+      let newTitleInput = document.createElement('input');
+      let newBtn = document.createElement('button');
+
+      newTitleInput.classList.add('new-input');
+      newBtn.classList.add('new-btn');
+
+      appTitle.remove();
+      appendToWhats(newForm, newTitleInput, newBtn);
+      appendToWhats(containerTitle, newForm);
+      renameBtn.setAttribute('disabled', 'true');
+      containerTitle.classList.add('title-container--active');
+      newBtn.textContent = '✅ Готово';
+
+      newForm.addEventListener('submit', function () {
+        console.log(newTitleInput.value);
+        let nameKey = 'title-' + localId;
+        localStorage.setItem(nameKey, JSON.stringify(newTitleInput.value));
+      });
+    });
+  }
+  function listStatusCheck(numLists) {
+    let indexs = document.querySelectorAll('.index-li');
+    for (let i = 0; i < indexs.length; ++i) {
+      for (let n = 0; n < numLists.length; ++n)
+        if (indexs[i].classList.contains(`index-li--${numLists[n]}`)) {
+          indexs[i].classList.remove('hide-none');
+        }
+    }
+    listRename();
+  }
+  function listRename() {
+    let indexs = document.querySelectorAll('.index-li');
+    let buf = 0;
+    console.log('ренайм');
+    for (let i = 0; i < indexs.length; i++) {
+      if (indexs[i].classList.contains('hide-none')) {
+        buf++;
+      }
+
+      indexs[i].childNodes[1].textContent = `!Список дел №${i - buf + 1}`;
+    }
+  }
+  function deleteList() {
+    let delListBtn = document.querySelectorAll('.delete-btn');
+    for (let i = 0; i < delListBtn.length; ++i) {
+      delListBtn[i].addEventListener('click', function () {
+        let listclass = delListBtn[i].parentNode;
+        listclass.remove();
+        numLists.splice(i, 1);
+        localStorage.setItem('lists', JSON.stringify(numLists));
+        console.log(`id${i + 1}`);
+        localStorage.setItem(`id${i + 1}`, JSON.stringify([]));
+        listRename();
+      });
     }
   }
 
