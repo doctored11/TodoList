@@ -174,6 +174,7 @@ img {
 .index-li {
   display: flex;
 }
+.nav:hover .plus-btn,
 .index-li:hover .ico-btn,
 .title-container:hover .ico-btn {
   visibility: visible;
@@ -199,6 +200,11 @@ form {
   padding: 8px 5px;
   border-color: rgba(0, 0, 0, 0.125);
 }
+.delete-btn--0 {
+  visibility: hidden;
+  width: 33px;
+  padding: 0 6px;
+}
 .new-btn {
   margin-left: -2px;
   height: 50%;
@@ -207,6 +213,17 @@ form {
   height: 90%;
   border-radius: 0 0.5rem 0.5rem 0;
   padding: 8px 7px;
+}
+.plus-btn{
+  width: 23px;
+  height: 23px;
+  text-align: center;
+  margin: 0;
+  padding:0 ;
+}
+.plus-btn:hover{
+ 
+  transform: scale(130%);
 }
 
 @media (max-width: 900px) {
